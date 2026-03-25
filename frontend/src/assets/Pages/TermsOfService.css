@@ -1,0 +1,4 @@
+/* TermsOfService.css — hero override (rest uses PrivacyPolicy.css shared styles) */
+.tos-hero {
+  background: linear-gradient(135deg, #502222 0%, #667eea 100%);
+}

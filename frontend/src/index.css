@@ -1,0 +1,246 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  --navbar-height: 80px;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Global responsive adjustments to avoid navbar overlap and unify small-screen spacing */
+/* page top offset to avoid content hidden under fixed navbar */
+main,
+.home,
+.about-page,
+.blog-page,
+.services-page,
+.contact-page,
+.signup-page,
+.login-page,
+.profile-page,
+.settings-page,
+.my-booking,
+.how-it-works-page,
+.home-cleaning-page {
+  padding-top: var(--navbar-height);
+}
+
+@media (max-width: 768px) {
+  :root { --navbar-height: 64px; }
+}
+
+/* Pull hero sections up so their gradient touches the navbar (removes visible gap) */
+.hero-section,
+.about-hero,
+.blog-hero,
+.login-hero,
+.how-hero,
+.service-hero,
+.services-hero,
+.contact-hero,
+.signup-hero,
+.profile-hero,
+.settings-hero {
+  margin-top: calc(-1 * var(--navbar-height));
+  padding-top: var(--navbar-height); /* preserve space so fixed navbar doesn't overlap content */
+}
+
+@media (max-width: 768px) {
+  .hero-section,
+  .about-hero,
+  .blog-hero,
+  .login-hero,
+  .how-hero,
+  .service-hero,
+  .services-hero,
+  .contact-hero,
+  .signup-hero,
+  .profile-hero,
+  .settings-hero {
+    margin-top: calc(-1 * var(--navbar-height));
+    padding-top: var(--navbar-height);
+  }
+}
+
+@media (max-width: 767px) {
+  .search-wrapper,
+  .newsletter-large-input,
+  .filter-select,
+  .user-type-btn {
+    min-width: 0 !important;
+    width: 100%;
+  }
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Unified booking modal theme for service pages */
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal-overlay,
+.home-cleaning .modal-overlay {
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+:is(.plumber, .electrician, .painting, .tutoring) .booking-modal,
+.home-cleaning .booking-modal {
+  border: 1px solid rgba(102, 126, 234, 0.16);
+  border-radius: 22px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-header,
+.home-cleaning .booking-modal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 1.45rem 1.2rem 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-header h2 {
+  font-size: 1.32rem;
+  margin-bottom: 0.32rem;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-header p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .booking-form,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-body {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group label {
+  color: #334155;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group input,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group select,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group textarea {
+  border: 1.5px solid rgba(102, 126, 234, 0.22);
+  border-radius: 12px;
+  background: #fff;
+  color: #1e293b;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group input:focus,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group select:focus,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .form-group textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.14);
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .btn-next,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .btn-submit,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .btn-prev,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-btn.secondary {
+  border: 1.5px solid rgba(102, 126, 234, 0.38);
+  color: #4658b6;
+  background: #fff;
+}
+
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .btn-submit:disabled,
+:is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-btn.primary:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  :is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal {
+    border-radius: 16px;
+  }
+
+  :is(.plumber, .electrician, .painting, .tutoring, .home-cleaning) .booking-modal .modal-header h2 {
+    font-size: 1.12rem;
+  }
+}

@@ -1,0 +1,15 @@
+Embedded MongoDB started for local/demo use.
+
+🌱  Seeding demo data ...
+
+✅  Demo data seeded successfully!
+
+  Demo login credentials:
+  ┌──────────────────────────────────────────────────────┐
+  │  Customer     : customer@demo.com  / Demo@1234       │
+  │  Professional : pro@demo.com       / Demo@1234       │
+  │  Professional : pro2@demo.com      / Demo@1234       │
+  └──────────────────────────────────────────────────────┘
+
+Server running on port 5002
+Database mode: embedded MongoDB (portable demo mode)
