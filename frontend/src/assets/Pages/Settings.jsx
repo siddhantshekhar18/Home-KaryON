@@ -4,6 +4,15 @@ import './Settings.css';
 
 const API_URL = 'http://localhost:5001/api/auth';
 
+const dispatchProfileUpdated = (nextUser) => {
+  window.dispatchEvent(new CustomEvent('profileUpdated', {
+    detail: {
+      user: nextUser,
+      updatedAt: Date.now()
+    }
+  }));
+};
+
 const DEFAULT_SETTINGS = {
   notifications: {
     email: true,
@@ -277,6 +286,7 @@ const Settings = () => {
       };
       setUser(updated);
       localStorage.setItem('user', JSON.stringify(updated));
+      dispatchProfileUpdated(updated);
       setMessage('success', 'Account profile updated successfully.');
     } catch (error) {
       setMessage('error', error.response?.data?.message || 'Unable to save profile changes.');
@@ -347,6 +357,7 @@ const Settings = () => {
       };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      dispatchProfileUpdated(updatedUser);
       setMessage('success', 'Settings saved successfully.');
     } catch (error) {
       setMessage('error', error.response?.data?.message || 'Unable to save settings.');

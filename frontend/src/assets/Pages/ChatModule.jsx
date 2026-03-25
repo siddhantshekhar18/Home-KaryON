@@ -41,6 +41,16 @@ const renderMessageWithLinks = (text) => {
   });
 };
 
+const getInitials = (name) => {
+  const value = String(name || '').trim();
+  if (!value) return 'CP';
+  const parts = value.split(/\s+/).filter(Boolean);
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('') || 'CP';
+};
+
 export default function ChatModule() {
   const navigate = useNavigate();
   const { bookingId } = useParams();
@@ -61,6 +71,7 @@ export default function ChatModule() {
   const [typingName, setTypingName] = useState('');
   const [joinFailed, setJoinFailed] = useState(false);
   const [realtimeError, setRealtimeError] = useState('');
+  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   const bottomRef = useRef(null);
   const socketRef = useRef(null);
@@ -169,6 +180,35 @@ export default function ChatModule() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [conversation?.messages?.length]);
 
+  useEffect(() => {
+    const handleProfileUpdated = (event) => {
+      const updatedUser = event?.detail?.user;
+      if (!updatedUser?.id) return;
+
+      setConversation((prev) => {
+        if (!prev?.counterpart?.userId) return prev;
+        if (String(prev.counterpart.userId) !== String(updatedUser.id)) return prev;
+
+        return {
+          ...prev,
+          counterpart: {
+            ...prev.counterpart,
+            profileImage: updatedUser.profileImage || ''
+          }
+        };
+      });
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdated);
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdated);
+    };
+  }, []);
+
+  useEffect(() => {
+    setAvatarLoadFailed(false);
+  }, [conversation?.counterpart?.profileImage]);
+
   const handleSend = async () => {
     const text = draft.trim();
     if (!text || !bookingId || isSending) return;
@@ -263,27 +303,58 @@ export default function ChatModule() {
     }, 1000);
   };
 
+  const handleInputKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
+  };
+
   const messages = conversation?.messages || [];
   const isCustomer = conversation?.role === 'customer';
   const counterpartName = conversation?.counterpart?.name || 'Chat Participant';
+  const counterpartImage = String(conversation?.counterpart?.profileImage || '').trim();
+  const shouldShowCounterpartImage = Boolean(counterpartImage) && !avatarLoadFailed;
   const notAssignedYet = isCustomer && !conversation?.counterpart?.userId;
+  const bookingStatus = conversation?.booking?.status || 'pending';
+  const scheduleText = `${conversation?.booking?.scheduleDate || 'Flexible date'} ${conversation?.booking?.scheduleTime || ''}`.trim();
 
   return (
     <div className="chat-module-page">
       <div className="chat-shell">
         <div className="chat-header">
-          <button className="chat-back-btn" onClick={() => navigate(-1)}>
-            ← Back
-          </button>
-          <div className="chat-partner-block">
-            <h1>{counterpartName}</h1>
-            <p>
-              Booking #{(conversation?.booking?.id || bookingId || '').slice(-6).toUpperCase()} · {conversation?.booking?.serviceName || 'Service'}
-            </p>
+          <div className="chat-header-main">
+            <button className="chat-back-btn" onClick={() => navigate(-1)}>
+              Back
+            </button>
+            <div className="chat-partner-avatar" aria-hidden="true">
+              {shouldShowCounterpartImage ? (
+                <img
+                  src={counterpartImage}
+                  alt={counterpartName}
+                  className="chat-partner-avatar-img"
+                  onError={() => setAvatarLoadFailed(true)}
+                />
+              ) : (
+                getInitials(counterpartName)
+              )}
+            </div>
+            <div className="chat-partner-block">
+              <h1>{counterpartName}</h1>
+              <p>
+                {conversation?.booking?.serviceName || 'Service'} · Booking #{(conversation?.booking?.id || bookingId || '').slice(-6).toUpperCase()}
+              </p>
+            </div>
           </div>
-          <button className="chat-refresh-btn" onClick={loadConversation}>
-            Refresh
-          </button>
+
+          <div className="chat-header-actions">
+            <span className={`chat-live-pill ${isConnected ? 'online' : 'offline'}`}>
+              {isConnected ? 'Live connected' : 'Offline mode'}
+            </span>
+            <button className="chat-refresh-btn" onClick={loadConversation}>
+              Refresh
+            </button>
+          </div>
         </div>
 
         {loading && (
@@ -303,10 +374,10 @@ export default function ChatModule() {
         {!loading && !error && conversation && (
           <>
             <div className="chat-booking-strip">
-              <span>Status: {conversation.booking?.status || 'pending'}</span>
-              <span>{conversation.booking?.scheduleDate || 'Flexible date'} {conversation.booking?.scheduleTime || ''}</span>
-              <span className={`chat-live-pill ${isConnected ? 'online' : 'offline'}`}>
-                {isConnected ? 'Live' : 'Offline'}
+              <span className="chat-chip">Status: {bookingStatus}</span>
+              <span className="chat-chip">{scheduleText}</span>
+              <span className="chat-chip chat-chip-muted">
+                {messages.length} {messages.length === 1 ? 'message' : 'messages'}
               </span>
             </div>
 
@@ -336,7 +407,9 @@ export default function ChatModule() {
                       <div className="chat-bubble">
                         <span className="chat-sender">{isMine ? 'You' : (msg.sender?.name || 'User')}</span>
                         <p>{renderMessageWithLinks(msg.text)}</p>
-                        <span className="chat-time">{formatDateTime(msg.sentAt)}</span>
+                        <div className="chat-bubble-meta">
+                          <span className="chat-time">{formatDateTime(msg.sentAt)}</span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -351,26 +424,30 @@ export default function ChatModule() {
               {conversation?.role === 'customer' && ['accepted', 'in-progress'].includes(conversation?.booking?.status) && (
                 <button
                   type="button"
-                  className="chat-refresh-btn"
+                  className="chat-share-btn"
                   onClick={handleShareBookingLocation}
                   disabled={isSending}
                 >
-                  {isSending ? 'Sharing...' : 'Share Booking Address'}
+                  {isSending ? 'Sharing...' : 'Share booking address'}
                 </button>
               )}
-              <textarea
-                value={draft}
-                onChange={(e) => {
-                  setDraft(e.target.value);
-                  emitTyping();
-                }}
-                placeholder="Type your message..."
-                rows={2}
-                maxLength={2000}
-              />
-              <button onClick={handleSend} disabled={isSending || !draft.trim()}>
-                {isSending ? 'Sending...' : 'Send'}
-              </button>
+
+              <div className="chat-composer">
+                <textarea
+                  value={draft}
+                  onChange={(e) => {
+                    setDraft(e.target.value);
+                    emitTyping();
+                  }}
+                  onKeyDown={handleInputKeyDown}
+                  placeholder="Write a message"
+                  rows={1}
+                  maxLength={2000}
+                />
+                <button onClick={handleSend} disabled={isSending || !draft.trim()}>
+                  {isSending ? 'Sending...' : 'Send'}
+                </button>
+              </div>
             </div>
           </>
         )}

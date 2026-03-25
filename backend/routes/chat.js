@@ -59,6 +59,27 @@ const roleKey = (role) => {
 
 const getBookingRoomName = (bookingId) => `booking:${bookingId}`;
 
+const toPublicImageUrl = (req, value) => {
+  if (!value) return '';
+  if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('data:') || value.startsWith('blob:')) {
+    return value;
+  }
+  if (value.startsWith('/uploads/')) {
+    return `${req.protocol}://${req.get('host')}${value}`;
+  }
+  if (value.startsWith('uploads/')) {
+    return `${req.protocol}://${req.get('host')}/${value}`;
+  }
+  return value;
+};
+
+const buildProfileImageById = (req, users = []) => users.reduce((acc, user) => {
+  if (user?._id) {
+    acc[String(user._id)] = toPublicImageUrl(req, user.profileImage || '');
+  }
+  return acc;
+}, {});
+
 const normalizeUnreadCounts = (unreadCounts = {}) => ({
   customer: Number(unreadCounts.customer) || 0,
   professional: Number(unreadCounts.professional) || 0,
@@ -140,13 +161,14 @@ const emitUnreadUpdatesToParticipants = (io, thread) => {
   }
 };
 
-const toConversationPayload = (thread, booking, role) => {
+const toConversationPayload = (thread, booking, role, profileImageById = {}) => {
   const counterpart = role === 'professional'
     ? {
         userId: booking.customer?.userId || null,
         name: booking.customer?.name || 'Customer',
         phone: booking.customer?.phone || '',
         email: booking.customer?.email || '',
+        profileImage: profileImageById[String(booking.customer?.userId || '')] || '',
         userType: 'customer'
       }
     : {
@@ -154,6 +176,7 @@ const toConversationPayload = (thread, booking, role) => {
         name: booking.professional?.name || 'Professional not assigned yet',
         phone: booking.professional?.phone || '',
         profession: booking.professional?.profession || '',
+        profileImage: profileImageById[String(booking.professional?.userId || '')] || '',
         userType: 'professional'
       };
 
@@ -200,6 +223,17 @@ router.get('/inbox', auth, async (req, res) => {
     const bookings = await Booking.find({ _id: { $in: bookingIds } })
       .select('customer professional service schedule status');
 
+    const participantIdSet = new Set();
+    bookings.forEach((booking) => {
+      if (booking?.customer?.userId) participantIdSet.add(String(booking.customer.userId));
+      if (booking?.professional?.userId) participantIdSet.add(String(booking.professional.userId));
+    });
+
+    const participantUsers = participantIdSet.size
+      ? await User.find({ _id: { $in: Array.from(participantIdSet) } }).select('_id profileImage')
+      : [];
+    const profileImageById = buildProfileImageById(req, participantUsers);
+
     const bookingById = bookings.reduce((acc, booking) => {
       acc[String(booking._id)] = booking;
       return acc;
@@ -213,12 +247,14 @@ router.get('/inbox', auth, async (req, res) => {
             name: booking?.customer?.name || 'Customer',
             phone: booking?.customer?.phone || '',
             email: booking?.customer?.email || '',
+            profileImage: profileImageById[String(booking?.customer?.userId || '')] || '',
             userType: 'customer'
           }
         : {
             name: booking?.professional?.name || 'Professional not assigned yet',
             phone: booking?.professional?.phone || '',
             profession: booking?.professional?.profession || '',
+            profileImage: profileImageById[String(booking?.professional?.userId || '')] || '',
             userType: 'professional'
           };
 
@@ -262,6 +298,15 @@ router.get('/booking/:bookingId', auth, async (req, res) => {
 
     const thread = await upsertThreadFromBooking(booking);
 
+    const participantIdSet = new Set();
+    if (booking?.customer?.userId) participantIdSet.add(String(booking.customer.userId));
+    if (booking?.professional?.userId) participantIdSet.add(String(booking.professional.userId));
+
+    const participantUsers = participantIdSet.size
+      ? await User.find({ _id: { $in: Array.from(participantIdSet) } }).select('_id profileImage')
+      : [];
+    const profileImageById = buildProfileImageById(req, participantUsers);
+
     const unreadCounts = normalizeUnreadCounts(thread.unreadCounts);
     unreadCounts[roleKey(role)] = 0;
 
@@ -275,7 +320,7 @@ router.get('/booking/:bookingId', auth, async (req, res) => {
 
     return res.json({
       success: true,
-      conversation: toConversationPayload(thread, booking, role)
+      conversation: toConversationPayload(thread, booking, role, profileImageById)
     });
   } catch (error) {
     console.error('Get booking chat error:', error);

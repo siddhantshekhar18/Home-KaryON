@@ -5,6 +5,7 @@ import API_BASE_URL, { chatAPI } from '../../api';
 import './Navbar.css';
 
 const SOCKET_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
 
 // Simple MD5 hash function for Gravatar (client-side implementation)
 const md5 = (string) => {
@@ -36,6 +37,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [avatarVersion, setAvatarVersion] = useState(0);
+  const [failedImageSrc, setFailedImageSrc] = useState('');
   const location = useLocation();
 
   const [user, setUser] = useState(() => {
@@ -56,38 +59,56 @@ const Navbar = () => {
   const isLoggedIn = Boolean(user);
   const isProfessional = user?.userType === 'professional';
 
+  const readUserFromStorage = useCallback(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (!token || !userData) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      setUser(JSON.parse(userData));
+    } catch {
+      setUser(null);
+    }
+  }, []);
+
   // Listen for localStorage changes to update user info in real-time
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'user' && e.newValue) {
-        try {
-          setUser(JSON.parse(e.newValue));
-        } catch {
-          setUser(null);
-        }
+      if (e.key === 'user' || e.key === 'token') {
+        readUserFromStorage();
+        setFailedImageSrc('');
+        setAvatarVersion((prev) => prev + 1);
       }
     };
 
-    // Also listen for custom profile update events
-    const handleProfileUpdate = () => {
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        try {
-          setUser(JSON.parse(userData));
-        } catch {
-          setUser(null);
-        }
+    const handleProfileUpdate = (event) => {
+      const nextUser = event?.detail?.user;
+      if (nextUser) {
+        setUser(nextUser);
+      } else {
+        readUserFromStorage();
       }
+      setFailedImageSrc('');
+      setAvatarVersion((prev) => prev + 1);
+    };
+
+    const handleWindowFocus = () => {
+      readUserFromStorage();
     };
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('profileUpdated', handleProfileUpdate);
+    window.addEventListener('focus', handleWindowFocus);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('profileUpdated', handleProfileUpdate);
+      window.removeEventListener('focus', handleWindowFocus);
     };
-  }, []);
+  }, [readUserFromStorage]);
 
   const loadUnread = useCallback(async () => {
     if (!isLoggedIn) {
@@ -191,13 +212,35 @@ const Navbar = () => {
   };
 
   // Get profile image - prioritize custom profileImage, then use Gravatar
+  const normalizeProfileImage = (rawImage) => {
+    const value = String(rawImage || '').trim();
+    if (!value) return '';
+
+    if (
+      value.startsWith('http://') ||
+      value.startsWith('https://') ||
+      value.startsWith('data:') ||
+      value.startsWith('blob:')
+    ) {
+      return value;
+    }
+
+    if (value.startsWith('/uploads/')) {
+      return `${API_ORIGIN}${value}`;
+    }
+
+    if (value.startsWith('uploads/')) {
+      return `${API_ORIGIN}/${value}`;
+    }
+
+    return value;
+  };
+
   const getProfileImage = () => {
     if (user) {
-      // If user has a custom profile image, use it
       if (user.profileImage) {
-        return user.profileImage;
+        return normalizeProfileImage(user.profileImage);
       }
-      // Otherwise, generate Gravatar from email
       if (user.email) {
         return getGravatarUrl(user.email, 40);
       }
@@ -206,6 +249,10 @@ const Navbar = () => {
   };
 
   const profileImage = getProfileImage();
+  const profileImageWithVersion = profileImage && !profileImage.startsWith('data:')
+    ? `${profileImage}${profileImage.includes('?') ? '&' : '?'}v=${avatarVersion}`
+    : profileImage;
+  const shouldShowImage = Boolean(profileImageWithVersion) && failedImageSrc !== profileImageWithVersion;
 
   const isLinkActive = (path) => location.pathname === path;
 
@@ -247,8 +294,13 @@ const Navbar = () => {
             {isLoggedIn ? (
               <div className="mobile-user-panel">
                 <a href="/profile" className="mobile-user-overview" onClick={closeMenu}>
-                  {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="mobile-user-avatar-img" />
+                  {shouldShowImage ? (
+                    <img
+                      src={profileImageWithVersion}
+                      alt="Profile"
+                      className="mobile-user-avatar-img"
+                      onError={() => setFailedImageSrc(profileImageWithVersion)}
+                    />
                   ) : (
                     <span className="mobile-user-avatar">{getUserInitials()}</span>
                   )}
@@ -291,8 +343,13 @@ const Navbar = () => {
               <div className="user-menu" onMouseEnter={() => setDropdownOpen(true)} onMouseLeave={() => setDropdownOpen(false)}>
                 <button className="user-menu-btn">
                   {/* Show profile image if available, otherwise show initials */}
-                  {profileImage ? (
-                    <img src={profileImage} alt="Profile" className="user-avatar-img" />
+                  {shouldShowImage ? (
+                    <img
+                      src={profileImageWithVersion}
+                      alt="Profile"
+                      className="user-avatar-img"
+                      onError={() => setFailedImageSrc(profileImageWithVersion)}
+                    />
                   ) : (
                     <span className="user-avatar">{getUserInitials()}</span>
                   )}
@@ -304,8 +361,13 @@ const Navbar = () => {
                 <div className={`user-dropdown ${dropdownOpen ? 'active' : ''}`}>
                   <div className="dropdown-header">
                     <div className="dropdown-user-info">
-                      {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="dropdown-avatar-img" />
+                      {shouldShowImage ? (
+                        <img
+                          src={profileImageWithVersion}
+                          alt="Profile"
+                          className="dropdown-avatar-img"
+                          onError={() => setFailedImageSrc(profileImageWithVersion)}
+                        />
                       ) : (
                         <div className="dropdown-avatar">{getUserInitials()}</div>
                       )}

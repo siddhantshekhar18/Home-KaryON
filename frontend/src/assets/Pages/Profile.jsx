@@ -4,6 +4,15 @@ import './Profile.css';
 
 const API_URL = 'http://localhost:5001/api/auth';
 
+const dispatchProfileUpdated = (nextUser) => {
+  window.dispatchEvent(new CustomEvent('profileUpdated', {
+    detail: {
+      user: nextUser,
+      updatedAt: Date.now()
+    }
+  }));
+};
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('personal');
@@ -156,8 +165,7 @@ const Profile = () => {
         setOriginalData(JSON.parse(JSON.stringify(response.data)));
         setProfileImageFile(null);
         setProfileImagePreview(response.data.profileImage);
-        // Dispatch custom event for Navbar and other components to update
-        window.dispatchEvent(new Event('profileUpdated'));
+        dispatchProfileUpdated(response.data);
         showToast('Profile updated successfully!', 'success');
       } else {
         // No image change, just update data
@@ -172,8 +180,7 @@ const Profile = () => {
         setFormData(response.data);
         setOriginalData(JSON.parse(JSON.stringify(response.data)));
         setProfileImagePreview(response.data.profileImage);
-        // Dispatch custom event for Navbar and other components to update
-        window.dispatchEvent(new Event('profileUpdated'));
+        dispatchProfileUpdated(response.data);
         showToast('Profile updated successfully!', 'success');
       }
     } catch (error) {
