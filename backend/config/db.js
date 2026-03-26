@@ -3,6 +3,11 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let memoryServerInstance = null;
 
+const isLocalMongoUri = (uri = '') => {
+  // Detect localhost-style MongoDB URIs so shared DB mode can reject machine-local DBs.
+  return /(?:^|@)(localhost|127\.0\.0\.1)(?::\d+)?(?:\/|$)/i.test(uri);
+};
+
 const connectWithUri = async (mongoUri) => {
   const conn = await mongoose.connect(mongoUri, {
     serverSelectionTimeoutMS: 5000
@@ -39,6 +44,7 @@ const startEmbeddedMongo = async () => {
 const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/karyon_data';
   const forceEmbedded = process.env.USE_EMBEDDED_DB === 'true';
+  const requireSharedDb = process.env.REQUIRE_SHARED_DB === 'true';
 
   if (process.env.SKIP_DB === 'true') {
     console.warn('SKIP_DB=true detected. Starting server without database connection.');
@@ -50,6 +56,20 @@ const connectDB = async () => {
     };
   }
 
+  if (requireSharedDb) {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('REQUIRE_SHARED_DB=true but MONGODB_URI is missing. Set a shared remote MongoDB URI (for example, MongoDB Atlas).');
+    }
+
+    if (isLocalMongoUri(process.env.MONGODB_URI)) {
+      throw new Error('REQUIRE_SHARED_DB=true does not allow localhost MongoDB URIs. Use a shared remote MongoDB URI.');
+    }
+
+    if (forceEmbedded) {
+      throw new Error('REQUIRE_SHARED_DB=true cannot be used with USE_EMBEDDED_DB=true. Disable embedded mode for shared database usage.');
+    }
+  }
+
   if (!forceEmbedded) {
     try {
       const connection = await connectWithUri(mongoUri);
@@ -59,6 +79,10 @@ const connectDB = async () => {
       console.error(`MongoDB connection error: ${error.message}`);
 
       if (process.env.NODE_ENV === 'production' && process.env.ALLOW_EMBEDDED_DB !== 'true') {
+        throw error;
+      }
+
+      if (requireSharedDb) {
         throw error;
       }
 

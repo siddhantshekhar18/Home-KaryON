@@ -25,6 +25,19 @@ Health check: `http://localhost:5001/api/health`
 
 - Set `USE_EMBEDDED_DB=true` in `.env` to always use the embedded MongoDB instance.
 - Set `SKIP_DB=true` only if you want to boot the API without any DB for smoke testing.
+- Set `REQUIRE_SHARED_DB=true` to enforce one shared remote DB (for example Atlas) across all machines.
+- In `REQUIRE_SHARED_DB=true` mode, backend startup is blocked if:
+   - `MONGODB_URI` is missing,
+   - `MONGODB_URI` points to localhost/127.0.0.1,
+   - `USE_EMBEDDED_DB=true`.
+
+### Atlas Setup For Shared Data
+
+1. Create a MongoDB Atlas cluster and database user.
+2. Add your app/server IP in Atlas Network Access (or temporarily `0.0.0.0/0` for testing).
+3. Put Atlas URI in `MONGODB_URI` inside `backend/.env`.
+4. Set `REQUIRE_SHARED_DB=true` to prevent accidental local/embedded DB usage.
+5. Restart backend.
 
 ## Contact Form Emails (Gmail)
 
