@@ -51,6 +51,17 @@ const getInitials = (name) => {
     .join('') || 'CP';
 };
 
+const getDialablePhone = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  const hasPlus = raw.startsWith('+');
+  const digits = raw.replace(/\D/g, '');
+  if (!digits) return '';
+
+  return hasPlus ? `+${digits}` : digits;
+};
+
 export default function ChatModule() {
   const navigate = useNavigate();
   const { bookingId } = useParams();
@@ -318,6 +329,9 @@ export default function ChatModule() {
   const notAssignedYet = isCustomer && !conversation?.counterpart?.userId;
   const bookingStatus = conversation?.booking?.status || 'pending';
   const scheduleText = `${conversation?.booking?.scheduleDate || 'Flexible date'} ${conversation?.booking?.scheduleTime || ''}`.trim();
+  const dialablePhone = getDialablePhone(conversation?.counterpart?.phone);
+  const canCallCounterpart = Boolean(dialablePhone) && !notAssignedYet;
+  const callButtonLabel = isCustomer ? 'Call professional' : 'Call customer';
 
   return (
     <div className="chat-module-page">
@@ -348,6 +362,19 @@ export default function ChatModule() {
           </div>
 
           <div className="chat-header-actions">
+            <a
+              className={`chat-call-btn ${!canCallCounterpart ? 'disabled' : ''}`}
+              href={canCallCounterpart ? `tel:${dialablePhone}` : '#'}
+              onClick={(event) => {
+                if (!canCallCounterpart) {
+                  event.preventDefault();
+                }
+              }}
+              aria-disabled={!canCallCounterpart}
+              title={canCallCounterpart ? `Call ${counterpartName}` : 'Phone number unavailable'}
+            >
+              {callButtonLabel}
+            </a>
             <span className={`chat-live-pill ${isConnected ? 'online' : 'offline'}`}>
               {isConnected ? 'Live connected' : 'Offline mode'}
             </span>
