@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
 import './Signup.css';
+import {
+  getConfiguredGoogleClientId,
+  isValidGoogleClientId,
+  resolveGoogleClientIdFromServer
+} from '../../googleAuthConfig';
 
 const API_URL = 'http://localhost:5001/api/auth';
 
@@ -42,11 +47,8 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const isGoogleConfigured =
-    Boolean(googleClientId) &&
-    !googleClientId.startsWith('your_') &&
-    googleClientId.endsWith('.apps.googleusercontent.com');
+  const [googleClientId, setGoogleClientId] = useState(getConfiguredGoogleClientId());
+  const isGoogleConfigured = isValidGoogleClientId(googleClientId);
 
   const professions = [
     'Plumber',
@@ -380,6 +382,30 @@ const Signup = () => {
   const handleGoogleError = () => {
     setErrorMessage('Google authentication was canceled or failed. Please try again.');
   };
+
+  useEffect(() => {
+    let isActive = true;
+
+    if (isValidGoogleClientId(googleClientId)) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    resolveGoogleClientIdFromServer()
+      .then((resolvedClientId) => {
+        if (isActive && isValidGoogleClientId(resolvedClientId)) {
+          setGoogleClientId(resolvedClientId);
+        }
+      })
+      .catch(() => {
+        // Keep signup page usable even when backend config endpoint is unavailable.
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [googleClientId]);
 
   return (
     <div className="signup-page">

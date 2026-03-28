@@ -299,6 +299,17 @@ router.post('/login/email', async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/google/config
+// @desc    Expose Google auth client config for frontend bootstrap
+// @access  Public
+router.get('/google/config', (req, res) => {
+  return res.json({
+    success: true,
+    enabled: Boolean(googleOAuthClient && hasValidGoogleClientId),
+    clientId: hasValidGoogleClientId ? googleClientId : ''
+  });
+});
+
 // @route   POST /api/auth/google
 // @desc    Login or signup using Google credential token
 // @access  Public

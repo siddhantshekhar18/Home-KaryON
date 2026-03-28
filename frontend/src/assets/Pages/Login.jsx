@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Login.css';
 import { Link, useLocation } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import {
+  getConfiguredGoogleClientId,
+  isValidGoogleClientId,
+  resolveGoogleClientIdFromServer
+} from '../../googleAuthConfig';
 
 const API_URL = 'http://localhost:5001/api/auth';
 
@@ -28,6 +33,7 @@ const Login = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [googleClientId, setGoogleClientId] = useState(getConfiguredGoogleClientId());
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -194,11 +200,31 @@ const handleSubmit = (e) => {
     }
   };
 
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const isGoogleConfigured =
-    Boolean(googleClientId) &&
-    !googleClientId.startsWith('your_') &&
-    googleClientId.endsWith('.apps.googleusercontent.com');
+  useEffect(() => {
+    let isActive = true;
+
+    if (isValidGoogleClientId(googleClientId)) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    resolveGoogleClientIdFromServer()
+      .then((resolvedClientId) => {
+        if (isActive && isValidGoogleClientId(resolvedClientId)) {
+          setGoogleClientId(resolvedClientId);
+        }
+      })
+      .catch(() => {
+        // Keep login page usable even when backend config endpoint is unavailable.
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [googleClientId]);
+
+  const isGoogleConfigured = isValidGoogleClientId(googleClientId);
 
   const handleGoogleSuccess = async (credentialResponse) => {
     const idToken = credentialResponse?.credential;
