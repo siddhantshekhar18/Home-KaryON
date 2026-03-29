@@ -1,5 +1,5 @@
-// API Base URL - Change this to your backend URL
-const API_BASE_URL = 'http://localhost:5001/api';
+// API Base URL - defaults to local backend when env var is not provided.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api').replace(/\/$/, '');
 
 // Helper function for making API requests
 const apiRequest = async (endpoint, options = {}) => {

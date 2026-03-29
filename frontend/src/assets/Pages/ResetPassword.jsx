@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './ForgotPassword.css';
 
-const API_URL = 'http://localhost:5001/api/auth';
+const API_URL = `${(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api').replace(/\/$/, '')}/auth`;
 
 const ResetPassword = () => {
   const { token } = useParams();

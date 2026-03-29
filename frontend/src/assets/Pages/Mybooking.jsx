@@ -324,7 +324,6 @@ const MyBooking = () => {
   // Fetch bookings by email (for guest users)
   const fetchBookingsByEmail = async (email) => {
     try {
-      const API_BASE_URL = 'http://localhost:5001/api';
       const response = await fetch(`${API_BASE_URL}/bookings/guest?email=${encodeURIComponent(email)}`, {
         headers: {
           'Content-Type': 'application/json'
@@ -476,7 +475,6 @@ const MyBooking = () => {
         response = await bookingsAPI.cancel(bookingId);
       } else {
         // Guest cancellation - need email verification
-        const API_BASE_URL = 'http://localhost:5001/api';
         response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/cancel`, {
           method: 'PUT',
           headers: {
@@ -586,7 +584,6 @@ const MyBooking = () => {
         response = await bookingsAPI.reschedule(selectedBooking.id, rescheduleData.date, rescheduleData.time);
       } else {
         // Guest — pass email for verification
-        const API_BASE_URL = 'http://localhost:5001/api';
         const res = await fetch(`${API_BASE_URL}/bookings/${selectedBooking.id}/reschedule`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -647,7 +644,6 @@ const MyBooking = () => {
         response = await bookingsAPI.addReview(bookingId, ratingValue, reviewText);
       } else {
         // Guest review - need email verification
-        const API_BASE_URL = 'http://localhost:5001/api';
         response = await fetch(`${API_BASE_URL}/bookings/${bookingId}/review`, {
           method: 'PUT',
           headers: {

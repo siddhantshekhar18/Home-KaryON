@@ -1,4 +1,4 @@
-const FALLBACK_API_BASE_URL = 'http://localhost:5001/api';
+const FALLBACK_API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api').replace(/\/$/, '');
 const GOOGLE_CLIENT_ID_CACHE_KEY = 'karyon_google_client_id';
 
 export const isValidGoogleClientId = (clientId) => {
@@ -26,7 +26,7 @@ export const getConfiguredGoogleClientId = () => {
     if (isValidGoogleClientId(cachedClientId)) {
       return cachedClientId;
     }
-  } catch (error) {
+  } catch {
     // Ignore localStorage access errors in restricted contexts.
   }
 
@@ -52,7 +52,7 @@ export const resolveGoogleClientIdFromServer = async () => {
     }
 
     localStorage.removeItem(GOOGLE_CLIENT_ID_CACHE_KEY);
-  } catch (error) {
+  } catch {
     // Ignore localStorage access errors in restricted contexts.
   }
 

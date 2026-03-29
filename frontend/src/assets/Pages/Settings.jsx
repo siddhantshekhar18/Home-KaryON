@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './Settings.css';
 
-const API_URL = 'http://localhost:5001/api/auth';
+const API_URL = `${(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api').replace(/\/$/, '')}/auth`;
 
 const dispatchProfileUpdated = (nextUser) => {
   window.dispatchEvent(new CustomEvent('profileUpdated', {
