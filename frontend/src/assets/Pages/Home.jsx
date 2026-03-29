@@ -5,10 +5,10 @@ import './BookingModal.css';
 import { bookingsAPI } from '../../api';
 
 const FALLBACK_STATS = {
-  customers: 50000,
-  professionals: 1500,
-  services: 5000,
-  cities: 25
+  customers: 0,
+  professionals: 0,
+  services: 0,
+  cities: 0
 };
 
 const Home = () => {
@@ -44,6 +44,11 @@ const Home = () => {
   
   const statsRef = useRef(null);
   const parallaxRef = useRef(null);
+
+  const formatCompactCount = (value) => new Intl.NumberFormat('en', {
+    notation: 'compact',
+    maximumFractionDigits: 1
+  }).format(value || 0);
 
   useEffect(() => {
     let isMounted = true;
@@ -306,7 +311,7 @@ const Home = () => {
           <div className="hero-content">
             <div className="hero-badge">
               <span className="badge-pulse"></span>
-              Trusted by 50,000+ Happy Customers
+              Your Home, Handled by Trusted Pros
             </div>
             
             <h1 className="hero-title">
@@ -338,17 +343,17 @@ const Home = () => {
 
             <div className="hero-stats">
               <div className="stat-item">
-                <span className="stat-number">50K+</span>
+                <span className="stat-number">{formatCompactCount(statsTargets.customers)}</span>
                 <span className="stat-label">Happy Clients</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
-                <span className="stat-number">1.5K+</span>
+                <span className="stat-number">{formatCompactCount(statsTargets.professionals)}</span>
                 <span className="stat-label">Professionals</span>
               </div>
               <div className="stat-divider"></div>
               <div className="stat-item">
-                <span className="stat-number">25+</span>
+                <span className="stat-number">{formatCompactCount(statsTargets.cities)}</span>
                 <span className="stat-label">Cities</span>
               </div>
             </div>
@@ -449,7 +454,7 @@ const Home = () => {
             <div className="stats-card">
               <div className="stats-icon">👥</div>
               <div className="stats-content">
-                <span className="stats-number">{counterValues.customers.toLocaleString()}+</span>
+                <span className="stats-number">{counterValues.customers.toLocaleString()}</span>
                 <span className="stats-label">Happy Customers</span>
               </div>
               <div className="stats-progress"></div>
@@ -458,7 +463,7 @@ const Home = () => {
             <div className="stats-card">
               <div className="stats-icon">👨‍🔧</div>
               <div className="stats-content">
-                <span className="stats-number">{counterValues.professionals}+</span>
+                <span className="stats-number">{counterValues.professionals.toLocaleString()}</span>
                 <span className="stats-label">Expert Pros</span>
               </div>
               <div className="stats-progress"></div>
@@ -467,7 +472,7 @@ const Home = () => {
             <div className="stats-card">
               <div className="stats-icon">🛠️</div>
               <div className="stats-content">
-                <span className="stats-number">{counterValues.services}+</span>
+                <span className="stats-number">{counterValues.services.toLocaleString()}</span>
                 <span className="stats-label">Services Done</span>
               </div>
               <div className="stats-progress"></div>
@@ -476,7 +481,7 @@ const Home = () => {
             <div className="stats-card">
               <div className="stats-icon">🏙️</div>
               <div className="stats-content">
-                <span className="stats-number">{counterValues.cities}+</span>
+                <span className="stats-number">{counterValues.cities.toLocaleString()}</span>
                 <span className="stats-label">Cities Covered</span>
               </div>
               <div className="stats-progress"></div>
