@@ -4,9 +4,18 @@ import './Home.css';
 import './BookingModal.css';
 import { bookingsAPI } from '../../api';
 
+const FALLBACK_STATS = {
+  customers: 50000,
+  professionals: 1500,
+  services: 5000,
+  cities: 25
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [statsTargets, setStatsTargets] = useState(FALLBACK_STATS);
+  const [statsReady, setStatsReady] = useState(false);
   const [counterValues, setCounterValues] = useState({
     customers: 0,
     professionals: 0,
@@ -36,6 +45,40 @@ const Home = () => {
   const statsRef = useRef(null);
   const parallaxRef = useRef(null);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHomeStats = async () => {
+      try {
+        const response = await bookingsAPI.getHomeStats();
+        const stats = response?.stats || {};
+
+        const nextTargets = {
+          customers: Number.isFinite(Number(stats.customers)) ? Math.max(0, Number(stats.customers)) : FALLBACK_STATS.customers,
+          professionals: Number.isFinite(Number(stats.professionals)) ? Math.max(0, Number(stats.professionals)) : FALLBACK_STATS.professionals,
+          services: Number.isFinite(Number(stats.services)) ? Math.max(0, Number(stats.services)) : FALLBACK_STATS.services,
+          cities: Number.isFinite(Number(stats.cities)) ? Math.max(0, Number(stats.cities)) : FALLBACK_STATS.cities
+        };
+
+        if (isMounted) {
+          setStatsTargets(nextTargets);
+          setStatsReady(true);
+        }
+      } catch {
+        if (isMounted) {
+          setStatsTargets(FALLBACK_STATS);
+          setStatsReady(true);
+        }
+      }
+    };
+
+    loadHomeStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Close modal on Escape key
   useEffect(() => {
     const handleEsc = (e) => { if (e.key === 'Escape') setShowBookingForm(false); };
@@ -45,12 +88,18 @@ const Home = () => {
 
   // Counter Animation
   useEffect(() => {
-    const targets = {
-      customers: 50000,
-      professionals: 1500,
-      services: 5000,
-      cities: 25
-    };
+    if (!statsReady) {
+      return undefined;
+    }
+
+    const targets = statsTargets;
+
+    setCounterValues({
+      customers: 0,
+      professionals: 0,
+      services: 0,
+      cities: 0
+    });
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -85,7 +134,7 @@ const Home = () => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [statsReady, statsTargets]);
 
   // Parallax Effect
   useEffect(() => {

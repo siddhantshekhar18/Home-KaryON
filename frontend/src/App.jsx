@@ -155,6 +155,13 @@ const SEOManager = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    // Force each route change to open from the top instead of preserving footer scroll.
+    const root = document.documentElement;
+    const previousScrollBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    window.scrollTo({ top: 0, left: 0 });
+    root.style.scrollBehavior = previousScrollBehavior;
+
     const currentMeta = routeMeta[pathname] || {
       title: "KaryON | Trusted Home Services Platform",
       description: "KaryON helps you book trusted professionals for your home service needs.",

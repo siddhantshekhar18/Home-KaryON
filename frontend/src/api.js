@@ -171,6 +171,9 @@ export const bookingsAPI = {
 
   // Get booking statistics
   getStats: () => apiRequest('/bookings/stats/user'),
+
+  // Get public homepage statistics
+  getHomeStats: () => apiRequest('/bookings/home-stats'),
 };
 
 // Professional API

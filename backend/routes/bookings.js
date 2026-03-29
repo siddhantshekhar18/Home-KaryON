@@ -400,6 +400,57 @@ router.get('/available', auth, async (req, res) => {
   }
 });
 
+// @route   GET /api/bookings/home-stats
+// @desc    Get public aggregate stats for home page
+// @access  Public
+router.get('/home-stats', async (req, res) => {
+  try {
+    const [
+      registeredCustomers,
+      totalProfessionals,
+      completedServices,
+      bookingCustomerEmails,
+      bookingCities,
+      userCities
+    ] = await Promise.all([
+      User.countDocuments({ userType: 'customer' }),
+      User.countDocuments({ userType: 'professional' }),
+      Booking.countDocuments({ status: 'completed' }),
+      Booking.distinct('customer.email', { 'customer.email': { $exists: true, $ne: '' } }),
+      Booking.distinct('address.city', { 'address.city': { $exists: true, $ne: '' } }),
+      User.distinct('address.city', { 'address.city': { $exists: true, $ne: '' } })
+    ]);
+
+    const uniqueBookingCustomers = new Set(
+      bookingCustomerEmails
+        .map((email) => String(email).trim().toLowerCase())
+        .filter(Boolean)
+    ).size;
+
+    const uniqueCities = new Set(
+      [...bookingCities, ...userCities]
+        .map((city) => String(city).trim().toLowerCase())
+        .filter(Boolean)
+    ).size;
+
+    res.json({
+      success: true,
+      stats: {
+        customers: Math.max(registeredCustomers, uniqueBookingCustomers),
+        professionals: totalProfessionals,
+        services: completedServices,
+        cities: uniqueCities
+      }
+    });
+  } catch (error) {
+    console.error('Get home stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching home statistics'
+    });
+  }
+});
+
 // @route   GET /api/bookings/:id/location
 // @desc    Get current professional live location for a booking
 // @access  Private for booking participants, or guest with customer email
