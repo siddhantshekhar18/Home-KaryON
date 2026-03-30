@@ -739,8 +739,11 @@ const MyBooking = () => {
     const completed = bookings.filter(b => b.status === 'completed').length;
     const upcoming = bookings.filter(b => b.status === 'accepted' || b.status === 'pending').length;
     const totalSpent = bookings
-      .filter(b => b.paymentStatus === 'paid')
-      .reduce((sum, b) => sum + (b.finalAmount || b.price), 0);
+      .filter(b => b.status === 'completed')
+      .reduce((sum, b) => {
+        const amount = Number(b.finalAmount ?? b.totalAmount ?? b.price ?? 0);
+        return sum + (Number.isFinite(amount) ? amount : 0);
+      }, 0);
     
     return { total, completed, upcoming, totalSpent };
   };
