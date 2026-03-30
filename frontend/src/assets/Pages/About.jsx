@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './About.css';
 import { publicAPI } from '../../api';
 
 const AboutUs = () => {
+  const navigate = useNavigate();
   const foundingYear = 2026;
   const currentYear = new Date().getFullYear();
   const yearsInService = Math.max(1, currentYear - foundingYear + 1);
@@ -428,7 +430,7 @@ const AboutUs = () => {
               </div>
 
               <div className="story-cta">
-                <button className="story-btn">
+                <button className="story-btn" onClick={() => navigate('/signup')}>
                   <span>Be an Early User</span>
                   <span className="btn-icon">→</span>
                 </button>
