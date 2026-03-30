@@ -365,8 +365,8 @@ const Home = () => {
               <span>24/7 Support</span>
             </div>
             <div className="floating-card card-2">
-              <span className="card-icon">⭐</span>
-              <span>4.9 Rating</span>
+              <span className="card-icon">🛡️</span>
+              <span>Verified Professionals</span>
             </div>
             <div className="floating-card card-3">
               <span className="card-icon">⚡</span>
@@ -604,9 +604,9 @@ const Home = () => {
                 <div className="cta-shine"></div>
               </button>
 
-              <button className="cta-secondary" onClick={() => window.location.href = 'tel:+1234567890'}>
+              <button className="cta-secondary" onClick={() => window.location.href = 'tel:+919305724440'}>
                 <span className="phone-icon">📞</span>
-                <span>Call Us: +1 (234) 567-890</span>
+                <span>Call Us: +91 (930) 5724-440</span>
               </button>
             </div>
 
@@ -620,8 +620,8 @@ const Home = () => {
             <div className="cta-card">
               <span className="cta-card-icon">🏆</span>
               <div className="cta-card-text">
-                <strong>5+ Years</strong>
-                <span>of Excellence</span>
+                <strong>Just Launched</strong>
+                <span>Built for Your Home</span>
               </div>
             </div>
 </div>
