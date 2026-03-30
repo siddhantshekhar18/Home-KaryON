@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { bookingsAPI } from '../../api';
 import './Services.css';
 
+const FALLBACK_STATS = {
+  customers: 0,
+  professionals: 0,
+  services: 0,
+  cities: 0
+};
+
 const Services = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('all');
@@ -13,6 +20,7 @@ const Services = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [heroStats, setHeroStats] = useState(FALLBACK_STATS);
   const [bookingForm, setBookingForm] = useState({
     name: '',
     email: '',
@@ -22,6 +30,45 @@ const Services = () => {
     address: '',
     problemDesc: ''
   });
+
+  const formatCompactCount = (value) => new Intl.NumberFormat('en', {
+    notation: 'compact',
+    maximumFractionDigits: 1
+  }).format(value || 0);
+
+  const formatStatValue = (value) => (value > 0 ? `${formatCompactCount(value)}+` : '0');
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadHeroStats = async () => {
+      try {
+        const response = await bookingsAPI.getHomeStats();
+        const stats = response?.stats || {};
+
+        const nextStats = {
+          customers: Number.isFinite(Number(stats.customers)) ? Math.max(0, Number(stats.customers)) : FALLBACK_STATS.customers,
+          professionals: Number.isFinite(Number(stats.professionals)) ? Math.max(0, Number(stats.professionals)) : FALLBACK_STATS.professionals,
+          services: Number.isFinite(Number(stats.services)) ? Math.max(0, Number(stats.services)) : FALLBACK_STATS.services,
+          cities: Number.isFinite(Number(stats.cities)) ? Math.max(0, Number(stats.cities)) : FALLBACK_STATS.cities
+        };
+
+        if (isMounted) {
+          setHeroStats(nextStats);
+        }
+      } catch {
+        if (isMounted) {
+          setHeroStats(FALLBACK_STATS);
+        }
+      }
+    };
+
+    loadHeroStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Categories Data
   const categories = [
@@ -234,16 +281,16 @@ const Services = () => {
           </p>
           <div className="services-hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-number">50+</span>
+              <span className="hero-stat-number">{formatStatValue(heroStats.services)}</span>
               <span className="hero-stat-label">Services</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-number">1500+</span>
+              <span className="hero-stat-number">{formatStatValue(heroStats.professionals)}</span>
               <span className="hero-stat-label">Professionals</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-number">24/7</span>
-              <span className="hero-stat-label">Support</span>
+              <span className="hero-stat-number">{formatStatValue(heroStats.cities)}</span>
+              <span className="hero-stat-label">Cities</span>
             </div>
           </div>
         </div>
