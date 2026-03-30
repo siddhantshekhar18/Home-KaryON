@@ -56,7 +56,7 @@ const AboutUs = () => {
           professionals: Math.max(prev.professionals, professionalsCount),
           years: yearsInService
         }));
-      } catch (error) {
+      } catch {
         // Fail silently so About page remains usable even if stats API is unavailable.
       }
     };
@@ -397,39 +397,39 @@ const AboutUs = () => {
             <div className="story-content">
               <span className="story-badge">Our Story</span>
               <h2 className="story-title">
-                From a Simple Idea to a <span className="title-accent">Nationwide Movement</span>
+                From a Practical Idea to a <span className="title-accent">Launch-Ready Platform</span>
               </h2>
               <p className="story-text">
-                It all started in 2019 when our founder, John Anderson, struggled to find a reliable plumber for his home. 
-                He realized there was a massive gap between skilled professionals and homeowners who needed them.
+                KaryON began with a simple observation: finding trusted home service professionals is still difficult in many places.
+                We are building a cleaner, faster way for homeowners to discover verified experts and book services with confidence.
               </p>
               <p className="story-text">
-                Today, KaryON has grown into a trusted platform connecting thousands of homeowners with verified 
-                professionals across 25+ cities. We've completed over 50,000 services with an average rating of 4.9 stars.
+                We are currently in the pre-launch phase, focused on onboarding professionals, refining booking flows,
+                and improving service quality standards before opening up for wider public rollout.
               </p>
               
               <div className="story-features">
                 <div className="story-feature">
                   <span className="feature-check">✓</span>
-                  <span>100% Verified Professionals</span>
+                  <span>Verified professionals onboarding</span>
                 </div>
                 <div className="story-feature">
                   <span className="feature-check">✓</span>
-                  <span>50,000+ Services Completed</span>
+                  <span>Transparent booking and pricing flow</span>
                 </div>
                 <div className="story-feature">
                   <span className="feature-check">✓</span>
-                  <span>24/7 Customer Support</span>
+                  <span>Faster service request matching</span>
                 </div>
                 <div className="story-feature">
                   <span className="feature-check">✓</span>
-                  <span>Satisfaction Guaranteed</span>
+                  <span>Dedicated post-booking support</span>
                 </div>
               </div>
 
               <div className="story-cta">
                 <button className="story-btn">
-                  <span>Join Our Journey</span>
+                  <span>Be an Early User</span>
                   <span className="btn-icon">→</span>
                 </button>
               </div>
@@ -439,29 +439,29 @@ const AboutUs = () => {
               <div className="story-card">
                 <div className="story-card-content">
                   <div className="story-icon">💡</div>
-                  <h3>2019</h3>
+                  <h3>2025</h3>
                   <p>The Idea</p>
                 </div>
               </div>
               <div className="story-card">
                 <div className="story-card-content">
                   <div className="story-icon">🚀</div>
-                  <h3>2020</h3>
-                  <p>Launch</p>
+                  <h3>2026</h3>
+                  <p>Platform Build</p>
                 </div>
               </div>
               <div className="story-card">
                 <div className="story-card-content">
                   <div className="story-icon">🌍</div>
-                  <h3>2022</h3>
-                  <p>Expansion</p>
+                  <h3>2026</h3>
+                  <p>Pilot Onboarding</p>
                 </div>
               </div>
               <div className="story-card">
                 <div className="story-card-content">
                   <div className="story-icon">🏆</div>
-                  <h3>2024</h3>
-                  <p>50K Services</p>
+                  <h3>Soon</h3>
+                  <p>Public Launch</p>
                 </div>
               </div>
             </div>
