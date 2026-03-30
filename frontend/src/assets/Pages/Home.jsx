@@ -154,28 +154,25 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Testimonials Data
+  // Pre-launch Service Promises
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Homeowner",
-      content: "The plumbing service was exceptional! The professional arrived on time and fixed the issue quickly. Highly recommended!",
-      rating: 5,
-      image: "👩"
+      name: "Verified Professionals",
+      role: "Background-checked and skilled experts",
+      content: "Every booking is assigned to trained professionals so the work is done safely, neatly, and with the right tools.",
+      image: "🛡️"
     },
     {
-      name: "Michael Chen",
-      role: "Property Manager",
-      content: "I've used their electrical services for multiple properties. Always reliable, professional, and fairly priced.",
-      rating: 5,
-      image: "👨"
+      name: "Clear Pricing",
+      role: "No hidden surprises",
+      content: "You get transparent estimates before work starts, with fair pricing that fits everyday home service needs.",
+      image: "💰"
     },
     {
-      name: "Emily Rodriguez",
-      role: "New Homeowner",
-      content: "From cleaning to painting, every service has been top-notch. They've become my go-to for all home needs.",
-      rating: 5,
-      image: "👩‍🦱"
+      name: "On-Time Support",
+      role: "Fast response across cities",
+      content: "From booking to completion, our team focuses on quick response, punctual arrival, and smooth communication.",
+      image: "⚡"
     }
   ];
 
@@ -529,23 +526,20 @@ const Home = () => {
       <section className="testimonials-section">
         <div className="testimonials-container">
           <div className="section-header">
-            <span className="section-subtitle">Client Feedback</span>
+            <span className="section-subtitle">Before You Book</span>
             <h2 className="section-title">
-              What Our <span className="title-accent">Customers</span> Say
+              What You Can <span className="title-accent">Expect</span>
             </h2>
+            <p className="section-description">
+              We are currently launching, so here are the service standards we are committed to delivering from day one.
+            </p>
           </div>
 
           <div className="testimonials-slider">
             <div className="testimonial-main">
               <div className="testimonial-content">
-                <div className="quote-icon">"</div>
+                <div className="quote-icon">✓</div>
                 <p className="testimonial-text">{testimonials[activeTestimonial].content}</p>
-                
-                <div className="testimonial-rating">
-                  {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => (
-                    <span key={i} className="star-filled">★</span>
-                  ))}
-                </div>
 
                 <div className="testimonial-author">
                   <div className="author-avatar">
