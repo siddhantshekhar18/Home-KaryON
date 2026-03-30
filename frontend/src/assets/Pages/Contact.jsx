@@ -3,6 +3,10 @@ import './Contact.css';
 import { contactAPI } from '../../api';
 
 const Contact = () => {
+  const supportPhone = '+91 93057 24440';
+  const supportEmail = 'thekaryon45@gmail.com';
+  const officeAddress = 'Rooma, Hathipur, Kanpur Nagar, Uttar Pradesh';
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -109,6 +113,22 @@ const Contact = () => {
     setActiveFaq(activeFaq === index ? null : index);
   };
 
+  const handleCallNow = () => {
+    window.location.href = `tel:${supportPhone}`;
+  };
+
+  const handleSendEmail = () => {
+    const mailtoUrl = `mailto:${supportEmail}?subject=${encodeURIComponent('Service Inquiry')}`;
+    window.open(mailtoUrl, '_self');
+  };
+
+  const handleGetDirections = () => {
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(officeAddress)}`;
+    window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(officeAddress)}`;
+
   return (
     <div className="contact-page">
       <section className="contact-hero">
@@ -157,9 +177,11 @@ const Contact = () => {
                 <div className="info-icon-glow"></div>
               </div>
               <h3 className="info-card-title">Call Us</h3>
-              <p className="info-card-detail">+91 93057 24440</p>
+              <p className="info-card-detail">
+                <a href={`tel:${supportPhone}`}>+91 93057 24440</a>
+              </p>
               <p className="info-card-note">24/7 Emergency Support</p>
-              <button className="info-card-btn">Call Now</button>
+              <a className="info-card-btn" href={`tel:${supportPhone}`} onClick={handleCallNow}>Call Now</a>
             </div>
 
             <div className="info-card">
@@ -168,9 +190,11 @@ const Contact = () => {
                 <div className="info-icon-glow"></div>
               </div>
               <h3 className="info-card-title">Email Us</h3>
-              <p className="info-card-detail">support@karyon.com</p>
+              <p className="info-card-detail">
+                <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
+              </p>
               <p className="info-card-note">24hr response time</p>
-              <button className="info-card-btn">Send Email</button>
+              <button type="button" className="info-card-btn" onClick={handleSendEmail}>Send Email</button>
             </div>
 
             <div className="info-card">
@@ -181,8 +205,8 @@ const Contact = () => {
               <h3 className="info-card-title">Visit Us</h3>
               <p className="info-card-detail">Rooma, Hathipur</p>
               <p className="info-card-detail">Kanpur Nagar, Uttar Pradesh</p>
-              <p className="info-card-note">Mon-Sun: 24/7</p>
-              <button className="info-card-btn">Get Directions</button>
+              <p className="info-card-note">Mon-Sat: 24/7</p>
+              <a className="info-card-btn" href={mapsUrl} target="_blank" rel="noopener noreferrer" onClick={handleGetDirections}>Get Directions</a>
             </div>
           </div>
         </div>
@@ -488,7 +512,7 @@ const Contact = () => {
         <div className="hours-container">
           <div className="hours-content">
             <div className="hours-header">
-              <span className="hours-badge">24/7 Availability</span>
+              <span className="hours-badge">Service Availability</span>
               <h2 className="hours-title">
                 Business <span className="title-accent">Hours</span>
               </h2>
@@ -498,25 +522,34 @@ const Contact = () => {
               <div className="hours-card">
                 <div className="hours-card-header">
                   <span className="hours-day">Monday - Friday</span>
-                  <span className="hours-time">24 Hours</span>
+                  <span className="hours-time">8:00 AM - 9:00 PM</span>
                 </div>
-                <p className="hours-note">Full service available</p>
+                <div className="hours-progress">
+                  <div className="progress-bar" style={{ width: '100%' }}></div>
+                </div>
+                <p className="hours-note">All standard home services available</p>
               </div>
 
               <div className="hours-card">
                 <div className="hours-card-header">
                   <span className="hours-day">Saturday</span>
-                  <span className="hours-time">24 Hours</span>
+                  <span className="hours-time">9:00 AM - 8:00 PM</span>
                 </div>
-                <p className="hours-note">Full service available</p>
+                <div className="hours-progress">
+                  <div className="progress-bar" style={{ width: '90%' }}></div>
+                </div>
+                <p className="hours-note">Most services available with priority slots</p>
               </div>
 
               <div className="hours-card">
                 <div className="hours-card-header">
                   <span className="hours-day">Sunday</span>
-                  <span className="hours-time">24 Hours</span>
+                  <span className="hours-time">10:00 AM - 6:00 PM</span>
                 </div>
-                <p className="hours-note">Emergency services only</p>
+                <div className="hours-progress">
+                  <div className="progress-bar" style={{ width: '65%' }}></div>
+                </div>
+                <p className="hours-note">Limited slots for regular bookings</p>
               </div>
 
               <div className="hours-card emergency">
@@ -524,7 +557,13 @@ const Contact = () => {
                   <span className="hours-day">Emergency</span>
                   <span className="hours-time">24/7</span>
                 </div>
-                <p className="hours-note">Always available for emergencies</p>
+                <div className="hours-progress">
+                  <div className="progress-bar" style={{ width: '100%' }}></div>
+                </div>
+                <p className="hours-note">Plumbing and electrical emergency response anytime</p>
+                <div className="emergency-contact">
+                  <a href={`tel:${supportPhone}`} className="emergency-phone">+91 93057 24440</a>
+                </div>
               </div>
             </div>
           </div>

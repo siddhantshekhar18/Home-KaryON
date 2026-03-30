@@ -223,6 +223,7 @@ html, body {
   opacity: 0;
   transform: rotate(45deg);
   transition: all 0.5s ease;
+  pointer-events: none;
 }
 
 .info-card:hover::before {
@@ -284,6 +285,7 @@ html, body {
 }
 
 .info-card-btn {
+  display: inline-block;
   padding: 0.8rem 2rem;
   border: 2px solid rgba(102, 126, 234, 0.2);
   background: transparent;
@@ -293,6 +295,9 @@ html, body {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  text-decoration: none;
+  position: relative;
+  z-index: 2;
 }
 
 .info-card-btn:hover {
@@ -944,6 +949,14 @@ select.form-select:-webkit-autofill {
   padding: 0.5rem 1rem;
   border-radius: 50px;
   display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.emergency-phone:hover {
+  background: rgba(255, 255, 255, 0.32);
+  transform: translateY(-1px);
 }
 
 /* ==================== */
