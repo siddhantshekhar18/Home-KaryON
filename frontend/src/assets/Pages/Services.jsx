@@ -432,7 +432,7 @@ const Services = () => {
                 <div className="feature-icon-glow"></div>
               </div>
               <h3 className="feature-title">Best Price Guarantee</h3>
-              <p className="feature-description">We match any genuine quote with additional 10% off</p>
+              <p className="feature-description">Transparent pricing with fair, competitive quotes</p>
             </div>
 
             <div className="feature-card">

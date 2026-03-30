@@ -836,7 +836,7 @@ const HomeCleaning = () => {
       <section className="cta-section">
         <div className="cta-container">
           <h2>Ready for a Spotless Home?</h2>
-          <p>Book now and get 10% off your first cleaning service</p>
+          <p>Book your first cleaning slot with trusted professionals</p>
           <button className="cta-btn" onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })}>
             Book Your Cleaning Now
             <span className="btn-icon">→</span>

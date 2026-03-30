@@ -321,7 +321,7 @@ const Home = () => {
             
             <p className="hero-description">
               From plumbing to painting, connect with verified professionals 
-              for all your home service needs. Book now and get 10% off!
+              for all your home service needs. Book trusted help in minutes.
             </p>
 
 <div className="hero-cta">
@@ -425,7 +425,7 @@ const Home = () => {
                     <div className="card-back">
                       <span className="back-icon">✨</span>
                       <h4>Book Now</h4>
-                      <p>Get 10% off on first service</p>
+                      <p>Quick booking with verified experts</p>
 <button className="back-btn" onClick={() => handleServiceClick(service)}>Book →</button>
                     </div>
                   </div>
