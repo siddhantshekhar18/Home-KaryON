@@ -33,6 +33,8 @@ const ForgotPassword = lazy(() => import("./assets/Pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./assets/Pages/ResetPassword"));
 const ChatModule = lazy(() => import("./assets/Pages/ChatModule"));
 const ChatInbox = lazy(() => import("./assets/Pages/ChatInbox"));
+const AdminLogin = lazy(() => import("./assets/Pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./assets/Pages/AdminDashboard"));
 
 const SITE_NAME = "KaryON";
 const SITE_URL = import.meta.env.VITE_SITE_URL || "https://karyon.app";
@@ -124,6 +126,16 @@ const routeMeta = {
     description: "Frequently asked questions about KaryON services, bookings, payments, and accounts.",
     keywords: "KaryON FAQ, frequently asked questions, help center"
   },
+  "/admin-login": {
+    title: "Admin Login | KaryON",
+    description: "Secure access to KaryON administration panel.",
+    keywords: "KaryON admin login, operations dashboard"
+  },
+  "/admin": {
+    title: "Admin Panel | KaryON",
+    description: "Manage bookings, reports, users, and platform operations.",
+    keywords: "KaryON admin panel, manage bookings, moderation"
+  },
   "/forgot-password": {
     title: "Forgot Password | KaryON",
     description: "Reset your KaryON account password securely via email.",
@@ -205,6 +217,29 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRaw = localStorage.getItem('user');
+  const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@karyon.app').toLowerCase();
+
+  if (!token || !userRaw) {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+  try {
+    const user = JSON.parse(userRaw);
+    const normalizedEmail = String(user?.email || '').toLowerCase();
+    const isAdmin = user?.role === 'admin' || user?.isAdmin === true || normalizedEmail === adminEmail;
+    if (!isAdmin) {
+      return <Navigate to="/" replace />;
+    }
+  } catch {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+  return children;
+};
+
 function App() {
   
   return (
@@ -240,6 +275,8 @@ function App() {
                       <Route path="/reset-password/:token" element={<ResetPassword />} />
                       <Route path="/chat/:bookingId" element={<ProtectedRoute><ChatModule /></ProtectedRoute>} />
                       <Route path="/chat-inbox" element={<ProtectedRoute><ChatInbox /></ProtectedRoute>} />
+                      <Route path="/admin-login" element={<AdminLogin />} />
+                      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           </Routes>
         </Suspense>
       </main>

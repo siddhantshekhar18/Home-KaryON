@@ -53,6 +53,15 @@ const UserSchema = new mongoose.Schema({
     enum: ['customer', 'professional'],
     default: 'customer'
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   // Customer specific fields
   address: {
     street: String,
@@ -203,10 +212,15 @@ const UserSchema = new mongoose.Schema({
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+UserSchema.virtual('isAdmin').get(function isAdmin() {
+  return this.role === 'admin';
 });
 
 // Sign JWT and return

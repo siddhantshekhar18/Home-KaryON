@@ -601,7 +601,7 @@ const AboutUs = () => {
       {/* Timeline Section */}
       
 
-      {/* Stats Section */}
+      {/* Stats Section 
       <section className="about-stats-section" ref={statsRef}>
         <div className="stats-background">
           <div className="stats-pattern"></div>
@@ -646,9 +646,9 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Team Section */}
+      {/* Team Section 
       <section className="team-section">
         <div className="team-container">
           <div className="section-header">
@@ -706,8 +706,10 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
+      */}
+      
 
-      {/* Achievements Section */}
+      {/* Achievements Section 
       <section className="achievements-section">
         <div className="achievements-container">
           <div className="section-header">
@@ -730,7 +732,9 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      */}
+
+      {/* Testimonials Section 
       <section className="about-testimonials">
         <div className="testimonials-container">
           <div className="section-header">
@@ -764,6 +768,8 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
+
+      */}
 
       {/* CTA Section */}
       <section className="about-cta">

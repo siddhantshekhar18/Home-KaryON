@@ -139,7 +139,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Email KaryON support"
-                  title="Send email to support@karyon.app"
+                  title="Send email to thekaryon45@gmail.com"
                 >
                   <span className="contact-icon-wrap" aria-hidden="true">
                     <svg className="contact-icon" viewBox="0 0 24 24" fill="none">
@@ -147,7 +147,7 @@ const Footer = () => {
                       <path d="M4.5 7l7.5 5.4L19.5 7" />
                     </svg>
                   </span>
-                  <span>support@karyon.app</span>
+                  <span>thekaryon45@gmail.com</span>
                 </a>
                 <a
                   className="contact-item contact-link"
@@ -171,7 +171,7 @@ const Footer = () => {
                       <path d="M12 7.5v5l3.4 2" />
                     </svg>
                   </span>
-                  <span>Mon - Sun: 8:00 AM - 10:00 PM</span>
+                  <span>Mon - Sat: 8:00 AM - 10:00 PM</span>
                 </div>
               </div>
             </div>
@@ -239,6 +239,8 @@ const Footer = () => {
                 <Link to="/sitemap" className="bottom-link">Sitemap</Link>
                 <span className="link-separator">•</span>
                 <Link to="/faq" className="bottom-link">FAQ</Link>
+                <span className="link-separator">•</span>
+                <Link to="/admin-login" className="bottom-link admin-entry-link">Admin</Link>
               </div>
 
               <div className="payment-methods">

@@ -1,37 +1,62 @@
-// API Base URL - defaults to local backend when env var is not provided.
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api').replace(/\/$/, '');
+const FALLBACK_API_BASE_URL = 'http://localhost:5001/api';
+
+export const getApiBaseUrl = () => {
+  const configuredBase = String(import.meta.env.VITE_API_BASE_URL || '').trim();
+  if (!configuredBase || configuredBase.startsWith('/')) {
+    return FALLBACK_API_BASE_URL;
+  }
+  return configuredBase.replace(/\/$/, '');
+};
+
+const API_BASE_URL = getApiBaseUrl();
+const API_BASE_CANDIDATES = Array.from(new Set([
+  API_BASE_URL,
+  typeof window !== 'undefined' ? `${window.location.origin}/api` : '',
+  FALLBACK_API_BASE_URL
+].filter(Boolean).map((base) => base.replace(/\/$/, ''))));
+
+const parseTextPreview = (rawText = '') => rawText.replace(/\s+/g, ' ').trim().slice(0, 180);
 
 // Helper function for making API requests
-const apiRequest = async (endpoint, options = {}) => {
+export const apiRequest = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
-  
-  const config = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-  };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-  const contentType = response.headers.get('content-type') || '';
+  let lastError = null;
 
-  let data;
-  if (contentType.includes('application/json')) {
-    data = await response.json();
-  } else {
-    const rawText = await response.text();
-    const cleanText = rawText.replace(/\s+/g, ' ').trim();
-    const preview = cleanText.slice(0, 120);
-    throw new Error(`Server returned a non-JSON response for ${endpoint}. ${preview}`);
+  for (const baseUrl of API_BASE_CANDIDATES) {
+    const config = {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+    };
+
+    try {
+      const response = await fetch(`${baseUrl}${endpoint}`, config);
+      const contentType = response.headers.get('content-type') || '';
+
+      if (!contentType.includes('application/json')) {
+        const rawText = await response.text();
+        const preview = parseTextPreview(rawText);
+        lastError = new Error(`Server returned a non-JSON response for ${endpoint}. ${preview}`);
+        continue;
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      return data;
+    } catch (error) {
+      lastError = error;
+    }
   }
 
-  if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong');
-  }
-
-  return data;
+  throw lastError || new Error('Something went wrong');
 };
 
 // Auth API
@@ -288,6 +313,65 @@ export const newsletterAPI = {
 export const publicAPI = {
   // Get platform stats for landing/about pages
   getPlatformStats: () => apiRequest('/auth/public-stats'),
+};
+
+const adminRequest = (endpoint, options = {}) => apiRequest(`/admin${endpoint}`, options);
+
+export const adminAPI = {
+  getDashboard: () => adminRequest('/dashboard'),
+
+  getUnassignedBookings: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return adminRequest(`/bookings/unassigned${queryString ? `?${queryString}` : ''}`);
+  },
+
+  getAssignableProfessionals: (serviceType = '') => {
+    const queryString = new URLSearchParams(serviceType ? { serviceType } : {}).toString();
+    return adminRequest(`/professionals/assignable${queryString ? `?${queryString}` : ''}`);
+  },
+
+  assignBooking: (bookingId, professionalId) =>
+    adminRequest(`/bookings/${bookingId}/assign`, {
+      method: 'PUT',
+      body: JSON.stringify({ professionalId })
+    }),
+
+  unassignBooking: (bookingId) =>
+    adminRequest(`/bookings/${bookingId}/unassign`, {
+      method: 'PUT'
+    }),
+
+  getUsers: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return adminRequest(`/users${queryString ? `?${queryString}` : ''}`);
+  },
+
+  updateUserStatus: (userId, isActive) =>
+    adminRequest(`/users/${userId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ isActive })
+    }),
+
+  getReports: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return adminRequest(`/reports${queryString ? `?${queryString}` : ''}`);
+  },
+
+  reviewReport: (reportId, payload) =>
+    adminRequest(`/reports/${reportId}/review`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    })
+};
+
+export const reportsAPI = {
+  create: (payload) =>
+    apiRequest('/reports', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+
+  getMine: () => apiRequest('/reports/mine')
 };
 
 export default API_BASE_URL;

@@ -151,7 +151,7 @@ const Contact = () => {
               <span className="hero-stat-label">Support</span>
             </div>
             <div className="hero-stat">
-              <span className="hero-stat-number">30min</span>
+              <span className="hero-stat-number">2 Hour</span>
               <span className="hero-stat-label">Response</span>
             </div>
             <div className="hero-stat">

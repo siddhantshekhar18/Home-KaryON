@@ -591,6 +591,19 @@
   color: white;
 }
 
+.admin-entry-link {
+  background: #2563eb;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.admin-entry-link:hover {
+  color: #fff;
+  background: #1d4ed8;
+}
+
 .link-separator {
   color: #4a5568;
 }

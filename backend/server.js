@@ -39,6 +39,8 @@ app.use('/api/chat', require('./routes/chat'));
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/faq', require('./routes/faq'));
 app.use('/api/newsletter', require('./routes/newsletter'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/admin', require('./routes/admin'));
 
 initChatSocket(io);
 
