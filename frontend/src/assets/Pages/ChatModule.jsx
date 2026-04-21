@@ -131,7 +131,7 @@ export default function ChatModule() {
       socket.emit('join_booking', { bookingId }, (ack) => {
         if (!ack?.success) {
           setJoinFailed(true);
-          setRealtimeError(ack?.message || 'Could not join live chat room');
+          setRealtimeError('');
         }
       });
     });
